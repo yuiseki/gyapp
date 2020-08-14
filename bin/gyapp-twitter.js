@@ -16,6 +16,7 @@ if(!userName || userName===""){
   process.exit(1);
 }
 const url = `https://twitter.com/${userName}`;
+const tmpdir = os.tmpdir();
 
 let browser;
 let deviceID;
@@ -34,6 +35,10 @@ let media = [];
   }
 })()
 
+/**
+ * tweetオブジェクトから必要な情報を抜き出したり生成したりする処理
+ * @param {Tweet} tweet Twitter内部APIのtweetオブジェクト
+ */
 function getTweetData(tweet){
   return new Promise(async (resolve, reject) => {
     let retweeted = false;
@@ -60,7 +65,11 @@ function getTweetData(tweet){
   })
 }
 
-const tmpdir = os.tmpdir();
+/**
+ * 画像をHTTP GETしてメタデータとセットでGyazoにアップロードする処理
+ * @param {Tweet} tweet Twitter内部APIのtweetオブジェクト
+ * @param {string} imageURL アップロードしたい画像のURL
+ */
 function uploadMediaToGyazo(tweet, imageURL){
   return new Promise(async (resolve, reject) => {
     const [pageTitle, tweetURL, desc] = await getTweetData(tweet);
@@ -85,6 +94,11 @@ function uploadMediaToGyazo(tweet, imageURL){
   })
 }
 
+/**
+ * 罰
+ * @param {Tweet} tweet Twitter内部APIのtweetオブジェクト
+ * @param {number} idx tweet.entities.mediaの何番目を処理しているか
+ */
 async function recursiveMediaPromise(tweet, idx){
   console.debug('media: '+idx);
   const promise = await new Promise( async (resolve) => {
@@ -100,6 +114,11 @@ async function recursiveMediaPromise(tweet, idx){
   }
 }
 
+/**
+ * 
+ * @param {[string]} keys Twitter内部APIのtweetオブジェクトのキー一覧
+ * @param {number} index tweetsの何番目を処理しているか
+ */
 async function recursiveTweetsPromise(keys, index) {
   console.debug('tweet: '+index)
   const promise = await new Promise( async (resolve) => {
