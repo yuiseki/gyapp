@@ -11,7 +11,10 @@ npm link
 #
 # gyapp
 #
-# Take screenshot of web site and upload to Gyazo
+# See full options
+gyapp --help
+
+# Take screenshot of web page and upload it to Gyazo
 gyapp https://google.com/
 
 # Set browser resolution
@@ -22,6 +25,8 @@ gyapp https://google.com/ --width 500 --height 500
 gyapp https://twitter.com/yuiseki -xpath //*[article]
 gyapp https://twitter.com/yuiseki -xpath "//a[@href='/yuiseki/header_photo']/parent::node()"
 gyapp https://google.com/search?q=JAL123 -xpath "//*[@id='rso']/div"
+# Capture web page from the beginning to the last
+gyapp https://www.yahoo.co.jp/ -xpath "/html/body"
 
 #
 # gyapp-twitter
@@ -39,5 +44,7 @@ npm link
 ```
 
 ## ToDo
+- 限界までスクロールしてからキャプチャを実行するオプションをつける
+- Instagram全部保存に対応する
 - はてなブックマーク全部保存に対応する
 - Pocket全部保存に対応する
