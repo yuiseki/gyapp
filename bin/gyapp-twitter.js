@@ -174,5 +174,5 @@ async function openTwitter(){
   const [page] = await browser.pages();
   page.on('response', getTweetsFromResponse);
   await page.goto(url, {waitUntil: 'networkidle2'});
-  //await autoScroll(page);
+  await autoScroll(page);
 }
