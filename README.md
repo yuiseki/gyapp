@@ -22,3 +22,9 @@ gyapp-twitter yuiseki
 yarn
 npm link
 ```
+
+## ToDo
+- コマンドライン引数で画面解像度の変更に対応する
+- コマンドライン引数でXPathに対応する
+- はてなブックマーク全部保存に対応する
+- Pocket全部保存に対応する
