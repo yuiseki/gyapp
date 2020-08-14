@@ -1,8 +1,8 @@
 # gyapp
 
-## Install
+## Install (Under development)
 ```bash
-npm install gyapp
+npm link
 ```
 
 
