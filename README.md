@@ -1,5 +1,11 @@
 # gyapp
 
+## Install
+```bash
+npm install gyapp
+```
+
+
 ## Install (Under development)
 ```bash
 npm link
