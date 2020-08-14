@@ -48,7 +48,7 @@ gyapp https://google.com/ --width 500 --height 500
 
 ##### Capture newest tweet
 ```bash
-gyapp https://twitter.com/yuiseki --xpath //*[article]
+gyapp https://twitter.com/yuiseki --xpath "//*[article]" --click "//span[text() = '表示']" --height 1200
 ```
 [![Image from Gyazo](https://i.gyazo.com/ac4be8c1eb39a4d5dc445f5edd414777.png)](https://gyazo.com/ac4be8c1eb39a4d5dc445f5edd414777)
 
@@ -89,7 +89,10 @@ npm link
 ```
 
 ## ToDo
+- xpathで複数マッチしたやつ順番にキャプチャしてアップロードしたい
 - 限界までスクロールしてからキャプチャを実行するオプションをつける
+- cookie読み込みに対応する
+- Twitter検索からの画像ぶっこぬきにも対応する
 - Instagram全部保存に対応する
 - はてなブックマーク全部保存に対応する
 - Pocket全部保存に対応する
