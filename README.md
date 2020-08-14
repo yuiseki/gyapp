@@ -15,3 +15,10 @@ gyapp https://google.com/
 gyapp-twitter yuiseki
 
 ```
+
+
+## Development
+```
+yarn
+npm link
+```
