@@ -73,10 +73,17 @@ const capture = async () => {
     await page.goto(url, {waitUntil: ['load', 'networkidle2'], timeout: 0});
     title = await page.title();
     if(argv.xpath){
-      const elements = await page.$x(argv.xpath);
-      if(elements[0]){
-        await elements[0].screenshot({ path: filepath })
-      }else{
+      console.log('capture xpath: '+argv.xpath)
+      try {
+        await page.waitForXPath(argv.xpath, {timeout:5000})
+        const elements = await page.$x(argv.xpath);
+        if(elements[0]){
+          await elements[0].screenshot({ path: filepath })
+        }else{
+          console.error('Element not found by xpath: '+argv.xpath);
+          process.exit(1)
+        }
+      } catch (error) {
         console.error('Element not found by xpath: '+argv.xpath);
         process.exit(1)
       }
