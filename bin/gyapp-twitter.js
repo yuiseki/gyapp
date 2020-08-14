@@ -5,8 +5,9 @@ var fs = require("fs")
 
 const yargs = require("yargs").argv;
 const puppeteer = require('puppeteer');
-const gyazo = require('../lib/gyazo');
 const fetch = require("node-fetch");
+
+const gyazo = require('../lib/gyazo');
 
 const userName = yargs._[0];
 if(!userName || userName===""){
@@ -67,14 +68,14 @@ function uploadMediaToGyazo(tweet, imageURL){
     const res = await fetch(imageURL);
     console.log('twitter res: '+res.status)
     if(res.ok){
-      let timestamp = new Date().getTime();
+      let timestamp = (new Date().getTime()/1000);
       const lastModified = res.headers.get('Last-Modified');
-      timestamp = new Date(lastModified).getTime();
+      timestamp = (new Date(lastModified).getTime()/1000);
       const filename = imageURL.replace(/[^a-z0-9]/gi, '_');
       const filepath = path.join(tmpdir, filename);
       const dest = fs.createWriteStream(filepath);
       dest.on('close', async ()=>{
-        await gyazo.uploadURL(deviceID, filepath, 'gyapp-twitter', pageTitle, tweetURL, desc, timestamp)
+        await gyazo.uploadWithMetadata(deviceID, filepath, 'gyapp-twitter', pageTitle, tweetURL, desc, timestamp)
         resolve()
       })
       res.body.pipe(dest)

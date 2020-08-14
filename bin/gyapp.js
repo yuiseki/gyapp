@@ -4,6 +4,8 @@ var puppeteer = require("puppeteer");
 var os = require('os');
 var path = require('path')
 
+const gyazo = require('../lib/gyazo');
+const { time } = require("console");
 
 const url = yargs._[0];
 if(!url || url===""){
@@ -22,19 +24,17 @@ const capture = async () => {
   try {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    await page.waitForNavigation({waitUntil: ['load', 'networkidle2']});
-    await page.goto(url);
+    await page.goto(url, {waitUntil: 'networkidle2', timeout: 0});
     title = await page.title();
     await page.screenshot({ path: filepath });
     await browser.close();
+    console.log('capture finish: '+filepath);
+    const deviceID = gyazo.getDeviceID();
+    const timestamp = (new Date().getTime()/1000);
+    gyazo.uploadWithMetadata(deviceID, filepath, 'gyapp', title, url, "", timestamp);
   } catch (err) {
-    console.err(err)
+    console.error(err)
   }
-}
-
-const upload = async () => {
-  console.log('upload start: '+filepath)
-
 }
 
 (async () => {
@@ -42,14 +42,5 @@ const upload = async () => {
     await capture()
   } catch (err) {
     console.error(err);
-  } finally {
-    console.log('capture finish: '+filepath);
-  }
-  try {
-    await upload()
-  } catch (err) {
-    console.error(err)
-  } finally {
-    console.log('upload finish')
   }
 })()
