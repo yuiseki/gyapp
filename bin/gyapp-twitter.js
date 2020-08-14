@@ -85,22 +85,26 @@ function uploadMediaToGyazo(tweet, imageURL){
   })
 }
 
-async function recursiveMediaPromise(tweet, index){
+async function recursiveMediaPromise(tweet, idx){
+  console.debug('media: '+idx);
   const promise = await new Promise( async (resolve) => {
-    let m = tweet.entities.media[index]
+    let m = tweet.entities.media[idx]
+    idx += 1
     await uploadMediaToGyazo(tweet, m.media_url_https)
     resolve()
   });
-  if(index < tweet.entities.media.length){
-    await recursiveMediaPromise(tweet, index)
+  if(idx < tweet.entities.media.length){
+    await recursiveMediaPromise(tweet, idx)
   }else{
     return promise;
   }
 }
 
 async function recursiveTweetsPromise(keys, index) {
+  console.debug('tweet: '+index)
   const promise = await new Promise( async (resolve) => {
     let tweet = tweets[keys[index]]
+    index += 1
     if(Object.keys(tweet.entities).indexOf('media') === -1){
       resolve()
     }else{
@@ -108,7 +112,6 @@ async function recursiveTweetsPromise(keys, index) {
       resolve()
     }
   });
-  index += 1
   if(index < keys.length){
     await recursiveTweetsPromise(keys, index)
   }else{
@@ -171,5 +174,5 @@ async function openTwitter(){
   const [page] = await browser.pages();
   page.on('response', getTweetsFromResponse);
   await page.goto(url, {waitUntil: 'networkidle2'});
-  await autoScroll(page);
+  //await autoScroll(page);
 }
