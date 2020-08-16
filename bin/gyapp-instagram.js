@@ -9,6 +9,7 @@ const fetch = require("node-fetch");
 
 const { GyappInstagram } = require('../lib/instagram');
 const { GyappUtils } = require('../lib/utils');
+const { resolve } = require("path");
 
 const argv = yargs
   .command('user [username]', 'Gyazo all images of specific instagram user.', (yargs) => {
@@ -39,8 +40,12 @@ const main = async () => {
 
   const url = `https://www.instagram.com/${argv.username}`;
   await page.goto(url, {waitUntil: ['load', 'networkidle2']});
-  await GyappUtils.scrollToLimit(page);
-  await instagram.getAllPostsURL(page);
+  await GyappUtils.scrollToLimit(page, (p)=>{
+    new Promise(async (resolve, reject) => {
+      await instagram.getAllPostsURL(p);
+      resolve()
+    })
+  });
   await instagram.uploadAllPosts(0);
   await browser.close();
 }

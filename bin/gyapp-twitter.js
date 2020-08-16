@@ -66,7 +66,9 @@ const main = async () => {
   
   const url = `https://twitter.com/${argv.username}`;
   await page.goto(url, {waitUntil: 'networkidle2'});
-  await GyappUtils.scrollToLimit(page);
+  await GyappUtils.scrollToLimit(page, (p)=>{
+    console.log('collected tweets: '+Object.keys(twitter.tweets).length);
+  });
   await twitter.uploadAllTweets(0);
   await browser.close();
 }

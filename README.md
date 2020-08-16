@@ -76,6 +76,13 @@ gyapp-twitter user yuiseki
 ```
 
 
+### gyapp-instagram
+
+##### Get All images of specific Instagram user and upload it to Gyazo
+```bash
+gyapp-instagram user yuiseki
+```
+
 ## Development
 ```
 yarn
