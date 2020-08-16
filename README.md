@@ -78,7 +78,7 @@ gyapp https://www.yahoo.co.jp/ --xpath "/html/body"
 
 ##### Get All images of specific Twitter user and upload it to Gyazo
 ```bash
-gyapp-twitter yuiseki
+gyapp-twitter user yuiseki
 ```
 
 
@@ -88,11 +88,16 @@ yarn
 npm link
 ```
 
-## ToDo
-- xpathで複数マッチしたやつ順番にキャプチャしてアップロードしたい
+## gyapp ToDo
 - 限界までスクロールしてからキャプチャを実行するオプションをつける
 - cookie読み込みに対応する
-- Twitter検索からの画像ぶっこぬきにも対応する
 - Instagram全部保存に対応する
 - はてなブックマーク全部保存に対応する
 - Pocket全部保存に対応する
+
+## gyapp-twitter ToDo
+- リツイートを含めるか含めないか指定できるようにする
+- スクロールをどこまでやるか指定できるようにする
+- Twitter検索からの画像ぶっこぬきにも対応する
+- Twitter検索でuntilを使って限界まで遡れないか試す
+- Twitterのリストを指定してそこのアカウントを全て集められるようにする

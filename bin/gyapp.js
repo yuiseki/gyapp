@@ -1,10 +1,69 @@
 #!/usr/bin/env node
-var yargs = require("yargs");
-var puppeteer = require("puppeteer");
 var os = require('os');
 var path = require('path');
+var fs = require('fs');
 
-const gyazo = require('../lib/gyazo');
+var yargs = require("yargs");
+var puppeteer = require("puppeteer");
+
+const { GyappUtils } = require('../lib/utils');
+
+const argv = yargs
+  .option('res', {
+    alias: 'r',
+    description: 'Browser Resolution. [SD, HD, FHD, 2K, 4K]',
+    type: 'string',
+    default: 'HD'
+  })
+  .option('width', {
+    alias: 'w',
+    description: 'Browser Width. It override resolution option.',
+    type: 'number'
+  })
+  .option('height', {
+    alias: 'h',
+    description: 'Browser Height. It override resolution option.',
+    type: 'number'
+  })
+  .option('xpath', {
+    alias: 'x',
+    description: 'XPath for elements to screenshot and upload.',
+    type: 'string'
+  })
+  .option('number', {
+    alias: 'n',
+    description: 'Number of element to screenshot and upload if XPath matched multiple elements. 0 means to screenshot and upload all mathed elements.',
+    type: 'number'
+  })
+  .option('click', {
+    alias: 'c',
+    description: 'XPath for elements to click before screenshot',
+    type: 'string'
+  })
+  .option('scroll', {
+    alias: 's',
+    description: 'Scroll pages before screenshot. 0 means to scroll the limit of web page.',
+    type: 'number'
+  })
+  .option('cookie', {
+    description: 'cookie file path to set puppeteer.',
+    type: 'string'
+  })
+  .help()
+  .argv;
+
+// check first arg is URL
+const url = argv._[0];
+if(!url || url===""){
+  console.log("Usage:");
+  console.log("\tgyapp [URL] {options}");
+  console.log("\tgyapp --help");
+  process.exit(1);
+}
+if(url.indexOf('http') !== 0){
+  console.log('first arg is not URL!');
+  process.exit(1);
+}
 
 const res = {
   'SD':{width:720, height:480},
@@ -14,108 +73,88 @@ const res = {
   '4K':{width:4096, height:2160}
 };
 
-const argv = yargs
-  .option('res', {
-    alias: 'r',
-    description: 'Browser Resolution. [SD, HD, FHD, 2K, 4K]',
-    default: 'HD'
-  })
-  .option('width', {
-    alias: 'w',
-    description: 'Browser Width. It override resolution option.',
-  })
-  .option('height', {
-    alias: 'h',
-    description: 'Browser Height. It override resolution option.',
-  })
-  .option('xpath', {
-    alias: 'x',
-    description: 'Specify XPath for capture element. It ignore resolution options.',
-  })
-  .option('number', {
-    alias: 'n',
-    description: 'Specify capture element index if XPath match multiple elements. 0 means capture and upload all.'
-  })
-  .option('click', {
-    alias: 'c',
-    description: 'Click app elements that match XPath before capture'
-  })
-  .help()
-  .argv;
+const main = async () => {
 
-const url = argv._[0];
-if(!url || url===""){
-  console.log("Usage:");
-  console.log("\tgyapp [URL] {options}");
-  console.log("\tgyapp --help");
-  process.exit(1);
-};
-
-let filename = url.replace(/[^a-z0-9]/gi, '_')+'.png';
-if(argv.xpath){
-  filename = url.replace(/[^a-z0-9]/gi, '_')+argv.xpath.replace(/[^a-z0-9]/gi, '_')+'.png'
-}
-const tmpdir = os.tmpdir();
-let filepath = path.join(tmpdir, filename);
-const deviceID = gyazo.getDeviceID();
-
-let title;
-
-const capture = async () => {
   console.log('capture start: '+url)
-  const browserRes = res[argv.res];
-  if(argv.width){
-    browserRes.width = argv.width;
-  }
-  if(argv.height){
-    browserRes.height = argv.height;
-  }
-  console.log('resolution: '+JSON.stringify(browserRes))
-  if(url.indexOf('http') !== 0){
-    console.log('first arg is not URL!');
-    process.exit(1);
-  }
   try {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    page.setViewport(browserRes)
+
+    // set browser resolution
+    const browserRes = res[argv.res];
+    if(argv.width){
+      browserRes.width = argv.width;
+    }
+    if(argv.height){
+      browserRes.height = argv.height;
+    }
+    console.log('resolution: '+JSON.stringify(browserRes));
+    page.setViewport(browserRes);
+
+    // set cookie
+    if(argv.cookie){
+      let cookieJSON = fs.readFileSync(argv.cookie);
+      let cookie = JSON.parse(cookieJSON);
+      page.setCookie(...cookie)
+    }
+
     await page.goto(url, {waitUntil: ['load', 'networkidle2'], timeout: 0});
-    title = await page.title();
+
+    // get title
+    const pageTitle = await page.title();
+
     if(argv.click){
+      // click by xpath
       try{
-        console.log('click xpath: '+argv.click);
+        console.log('click by xpath: '+argv.click);
         await page.waitForXPath(argv.click, {timeout:5000})
         const clickElements = await page.$x(argv.click)
-        await clickAllElements(clickElements, 0)
+        await GyappUtils.clickAllElements(clickElements, 0)
       }catch{}
     }
+
+    if(argv.scroll !== undefined){
+      console.log('scroll: '+argv.scroll);
+      if(argv.scroll===0){
+        await GyappUtils.scrollToLimit(page)
+      }else{
+        await GyappUtils.scrollTo(page, argv.scroll)
+      }
+    }
+
+    const utils = new GyappUtils({
+      url: url,
+      title: pageTitle,
+      xpath: argv.xpath
+    })
     if(argv.xpath){
-      console.log('capture xpath: '+argv.xpath)
+      // screenshot by xpath
       try {
+        console.log('screenshot by xpath: '+argv.xpath)
         await page.waitForXPath(argv.xpath, {timeout:5000})
         const elements = await page.$x(argv.xpath);
-        if(!elements || !elements[0]){
-          console.error('Element not found by xpath: '+argv.xpath);
-          process.exit(1)
-        }
         if(argv.number === undefined){
-          await elements[0].screenshot({ path: filepath })
-          upload(filepath)
-        }else{
-          if(argv.number == 0){
-            await uploadAllElements(elements, 0);
-          }else{
-            await elements[argv.number].screenshot({ path: filepath })
-            upload(filepath)
-          }
+          argv.number = 1
         }
-      } catch (error) {
+        if(argv.number === 0){
+          // screenshot all matched elements
+          await utils.uploadAllElements(elements, 0);
+        }else{
+          // screenshot one element
+          const filepath = utils.getTmpFilePath(argv.number)
+          await elements[argv.number-1].screenshot({ path: filepath })
+          await utils.uploadWithMetadata(filepath)
+        }
+      } catch (err) {
         console.error('Element not found by xpath: '+argv.xpath);
+        console.error(err);
         process.exit(1)
       }
     }else{
+      // screenshot page
+      const filepath = utils.getTmpFilePath();
       await page.screenshot({ path: filepath });
-      upload(filepath)
+      await utils.uploadWithMetadata(filepath)
     }
     await browser.close();
   } catch (err) {
@@ -123,48 +162,13 @@ const capture = async () => {
   }
 }
 
-async function clickAllElements(elements, idx){
-  console.log('clickAllElements: '+idx);
-  const promise = await new Promise( async (resolve) => {
-    e = elements[idx];
-    idx += 1;
-    await e.click()
-    resolve()
-  })
-  if(idx < elements.length){
-    await clickAllElements(elements, idx)
-  }else{
-    promise
-  }
-}
 
-async function uploadAllElements(elements, idx){
-  console.log('uploadAllElements: '+idx);
-  const promise = await new Promise( async (resolve) => {
-    e = elements[idx]
-    idx += 1
-    filename = url.replace(/[^a-z0-9]/gi, '_')+argv.xpath.replace(/[^a-z0-9]/gi, '_')+'_'+idx+'.png';
-    filepath = path.join(tmpdir, filename);
-    await e.screenshot({path:filepath})
-    upload(filepath)
-    resolve()
-  })
-  if(idx < elements.length){
-    await uploadAllElements(elements, idx)
-  }else{
-    return promise
-  }
-}
 
-function upload(capturePath){
-  console.log('capture finish: '+capturePath);
-  const timestamp = (new Date().getTime()/1000);
-  gyazo.uploadWithMetadata(deviceID, capturePath, 'gyapp', title, url, "", timestamp);
-}
+
 
 (async () => {
   try {
-    await capture()
+    await main()
   } catch (err) {
     console.error(err);
   }
