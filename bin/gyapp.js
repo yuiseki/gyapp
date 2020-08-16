@@ -32,7 +32,7 @@ const argv = yargs
   })
   .option('number', {
     alias: 'n',
-    description: 'Number of element to screenshot and upload if XPath matched multiple elements. 0 means to screenshot and upload all mathed elements.',
+    description: 'Number of element to screenshot and upload if XPath matched multiple elements. 0 means to screenshot and upload all matched elements.',
     type: 'number'
   })
   .option('click', {
