@@ -19,5 +19,8 @@
     "node-fetch": "^2.6.0",
     "puppeteer": "^5.2.1",
     "yargs": "^15.4.1"
+  },
+  "devDependencies": {
+    "jest": "^26.4.0"
   }
 }

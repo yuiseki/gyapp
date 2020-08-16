@@ -8,6 +8,22 @@ npm install gyapp -g
 
 ## Usage
 
+### gyapp-twitter
+
+##### Get All images of specific Twitter user and upload it to Gyazo
+```bash
+gyapp-twitter user yuiseki
+```
+
+
+### gyapp-instagram
+
+##### Get All images of specific Instagram user and upload it to Gyazo
+```bash
+gyapp-instagram user yuiseki
+```
+
+
 ### gyapp
 
 #### See full options
@@ -68,21 +84,6 @@ gyapp https://www.yahoo.co.jp/ --xpath "/html/body"
 [![Image from Gyazo](https://i.gyazo.com/9141b83ed024e5ee4c5d75e06bda94db.png)](https://gyazo.com/9141b83ed024e5ee4c5d75e06bda94db)
 
 
-### gyapp-twitter
-
-##### Get All images of specific Twitter user and upload it to Gyazo
-```bash
-gyapp-twitter user yuiseki
-```
-
-
-### gyapp-instagram
-
-##### Get All images of specific Instagram user and upload it to Gyazo
-```bash
-gyapp-instagram user yuiseki
-```
-
 ## Development
 ```
 yarn
@@ -99,3 +100,6 @@ npm link
 - Twitter検索からの画像ぶっこぬきにも対応する
 - Twitter検索でuntilを使って限界まで遡れないか試す
 - Twitterのリストを指定してそこのアカウントを全て集められるようにする
+
+## gyapp-instagram ToDo
+- お気に入りした画像もぶっこぬきできるようにする
