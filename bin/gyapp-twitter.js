@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var os = require("os");
-var path = require("path")
-var fs = require("fs")
+var path = require("path");
+var fs = require("fs");
 
 const yargs = require("yargs");
 const puppeteer = require('puppeteer');
@@ -13,7 +13,7 @@ const { GyappTwitter } = require('../lib/twitter');
 const argv = yargs
   .command('user [username]', 'Gyazo all images of specific twitter user.', (yargs) => {
     return yargs.positional('username', {
-      describe: 'Twitter username',
+      describe: 'Twitter username.',
       require: true
     })
     .option('limit', {
@@ -39,8 +39,6 @@ const argv = yargs
 const arg = argv._[0];
 if(!arg || arg===""){
   console.log("Usage:");
-  console.log("\tgyapp-twitter user [username]");
-  //console.log("\tgyapp-twitter search [query]");
   console.log("\tgyapp-twitter --help");
   process.exit(1);
 }

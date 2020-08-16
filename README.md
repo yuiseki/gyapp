@@ -6,12 +6,6 @@ npm install gyapp -g
 ```
 
 
-## Install (Under development)
-```bash
-npm link
-```
-
-
 ## Usage
 
 ### gyapp
@@ -89,14 +83,11 @@ npm link
 ```
 
 ## gyapp ToDo
-- 限界までスクロールしてからキャプチャを実行するオプションをつける
-- cookie読み込みに対応する
 - Instagram全部保存に対応する
 - はてなブックマーク全部保存に対応する
 - Pocket全部保存に対応する
 
 ## gyapp-twitter ToDo
-- リツイートを含めるか含めないか指定できるようにする
 - スクロールをどこまでやるか指定できるようにする
 - Twitter検索からの画像ぶっこぬきにも対応する
 - Twitter検索でuntilを使って限界まで遡れないか試す

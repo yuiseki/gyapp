@@ -9,7 +9,7 @@
   "bin": {
     "gyapp": "bin/gyapp.js",
     "gyapp-twitter": "bin/gyapp-twitter.js",
-    "gyapp-upload": "bin/gyapp-upload.js"
+    "gyapp-instagram": "bin/gyapp-instagram.js"
   },
   "author": "yuiseki <yuiseki@gmail.com>",
   "homepage": "https://github.com/yuiseki/gyapp",
