@@ -9,25 +9,32 @@ const fetch = require("node-fetch");
 
 const { GyappUtils } = require('../lib/utils');
 const { GyappTwitter } = require('../lib/twitter');
+const { resolve } = require("path");
 
 const argv = yargs
-  .command('user [username]', 'Gyazo all images of specific twitter user.', (yargs) => {
+  .command('user [username]', 'Gyazo all images of tweets of specific twitter user.', (yargs) => {
     return yargs.positional('username', {
       describe: 'Twitter username.',
       require: true
     })
-    .option('limit', {
-      alias: 'l',
-      description: 'Load limit of tweets. 0 means no limit.',
-      type: 'number',
-      default: 0
+  })
+  .command('like [username]', 'Gyazo all images of liked tweets of specific twitter user. cookie required.', (yargs) => {
+    return yargs.positional('username', {
+      describe: 'Twitter username.',
+      require: true
     })
-    .option('include-retweet', {
-      alias: 'rt',
-      description: 'Include retweet or not.',
-      type: 'boolean',
-      default: false
-    })
+  })
+  .option('include-retweets', {
+    alias: 'r',
+    description: 'Include retweets or not.',
+    type: 'boolean',
+    default: false
+  })
+  .option('limit', {
+    alias: 'l',
+    description: 'Load limit of tweets. 0 means no limit.',
+    type: 'number',
+    default: 0
   })
   .option('cookie', {
     description: 'cookie file path to set puppeteer.',
@@ -47,27 +54,49 @@ const query = encodeURIComponent(arg);
 
 
 const main = async () => {
+  console.log('command: '+argv._[0])
+  console.log('include retweets: '+argv.includeRetweets)
+
   const browser = await puppeteer.launch();
   const [page] = await browser.pages();
 
-    // set cookie
-    if(argv.cookie){
-      let cookieJSON = fs.readFileSync(argv.cookie);
-      let cookie = JSON.parse(cookieJSON);
-      page.setCookie(...cookie)
-    }
+  // set cookie
+  if(argv.cookie){
+    let cookieJSON = fs.readFileSync(argv.cookie);
+    let cookie = JSON.parse(cookieJSON);
+    page.setCookie(...cookie)
+  }
+
+  let url;
+  switch (argv._[0]) {
+    case 'user':
+      url = `https://twitter.com/${argv.username}`;
+      break;
+    case 'like':
+      url = `https://twitter.com/${argv.username}/likes`;
+    default:
+      break;
+  }
+  console.log('goto: '+url);
 
   const twitter = new GyappTwitter({
     browser: browser,
     userName: argv.username,
-    includeRetweet: argv.includeRetweet
+    command: argv._[0],
+    includeRetweet: argv.includeRetweets
   });
   page.on('response', twitter.getTweetsFromResponse());
   
-  const url = `https://twitter.com/${argv.username}`;
   await page.goto(url, {waitUntil: 'networkidle2'});
-  await GyappUtils.scrollToLimit(page, (p)=>{
+  await GyappUtils.scrollToLimit(page, async (p)=>{
     console.log('collected tweets: '+Object.keys(twitter.tweets).length);
+    return new Promise((resolve)=>{
+      if(Object.keys(twitter.tweets).length < argv.limit){
+        resolve(true)
+      }else{
+        resolve(false)
+      }
+    })
   });
   await twitter.uploadAllTweets(0);
   await browser.close();

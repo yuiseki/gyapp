@@ -18,6 +18,16 @@ const argv = yargs
       require: true
     })
   })
+  .option('limit', {
+    alias: 'l',
+    description: 'Load limit of images. 0 means no limit.',
+    type: 'number',
+    default: 0
+  })
+  .option('cookie', {
+    description: 'cookie file path to set puppeteer.',
+    type: 'string'
+  })
   .help()
   .argv;
 
@@ -33,6 +43,13 @@ const main = async () => {
   const browser = await puppeteer.launch();
   const [page] = await browser.pages();
 
+  // set cookie
+  if(argv.cookie){
+    let cookieJSON = fs.readFileSync(argv.cookie);
+    let cookie = JSON.parse(cookieJSON);
+    page.setCookie(...cookie)
+  }
+
   const instagram = new GyappInstagram({
     browser: browser,
     userName: argv.username
@@ -43,7 +60,7 @@ const main = async () => {
   await GyappUtils.scrollToLimit(page, (p)=>{
     new Promise(async (resolve, reject) => {
       await instagram.getAllPostsURL(p);
-      resolve()
+      resolve(true)
     })
   });
   await instagram.uploadAllPosts(0);

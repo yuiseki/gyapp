@@ -13,7 +13,7 @@ gyapp-url-xpath-number:
 
 .PHONY: gyapp-url-click
 gyapp-url-click:
-	gyapp https://twitter.com/yuiseki -c "//span[text() = 'フォロー']"
+	gyapp https://yahoo.co.jp -c "//*[@id='tabTopics2']/a"
 
 .PHONY: test
 test: gyapp-url gyapp-url-xpath gyapp-url-xpath-number gyapp-url-click ;
