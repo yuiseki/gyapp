@@ -24,6 +24,12 @@ const argv = yargs
       require: true
     })
   })
+  .command('search [query]', 'Gyazo all images of liked tweets of specific twitter search query.', (yargs) => {
+    return yargs.positional('query', {
+      describe: 'Twitter search query.',
+      require: true
+    })
+  })
   .option('include-retweets', {
     alias: 'r',
     description: 'Include retweets or not.',
@@ -74,6 +80,10 @@ const main = async () => {
       break;
     case 'like':
       url = `https://twitter.com/${argv.username}/likes`;
+      break;
+    case 'search':
+      url = `https://twitter.com/search?q=${encodeURIComponent(argv.query)}`;
+      break;
     default:
       break;
   }
@@ -88,15 +98,17 @@ const main = async () => {
   page.on('response', twitter.getTweetsFromResponse());
   
   await page.goto(url, {waitUntil: 'networkidle2'});
-  await GyappUtils.scrollToLimit(page, async (p)=>{
+  await GyappUtils.scrollToLimit(page, async (page)=>{
     console.log('collected tweets: '+Object.keys(twitter.tweets).length);
     return new Promise((resolve)=>{
       if(Object.keys(twitter.tweets).length < argv.limit){
-        resolve(true)
+        resolve(true);
       }else{
-        resolve(false)
+        console.log(argv.limit);
+        console.log('collect tweets finish');
+        resolve(false);
       }
-    })
+    });
   });
   await twitter.uploadAllTweets(0);
   await browser.close();
@@ -104,7 +116,7 @@ const main = async () => {
 
 (async () => {
   try {
-    await main()
+    await main();
   } catch (err) {
     console.error(err);
   }
