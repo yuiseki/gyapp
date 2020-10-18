@@ -82,7 +82,7 @@ const main = async () => {
       url = `https://twitter.com/${argv.username}/likes`;
       break;
     case 'search':
-      url = `https://twitter.com/search?q=${encodeURIComponent(argv.query)}`;
+      url = `https://twitter.com/search?q=${encodeURIComponent(argv.query)}&src=typed_query&f=image`;
       break;
     default:
       break;
