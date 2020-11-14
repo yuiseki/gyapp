@@ -16,6 +16,7 @@
   "homepage": "https://github.com/yuiseki/gyapp",
   "license": "MIT",
   "dependencies": {
+    "abort-controller": "^3.0.0",
     "form-data": "^3.0.0",
     "node-fetch": "^2.6.0",
     "puppeteer": "^5.2.1",
